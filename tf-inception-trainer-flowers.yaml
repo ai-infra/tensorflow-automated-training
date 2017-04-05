@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: inception-trainer-deployment
+spec:
+  template:
+    metadata:
+      labels:
+        app: inception-flowers-trainer
+    spec:
+       volumes:
+         - name: nvidia-driver
+           hostPath:
+             path: /usr/lib/nvidia-375/
+         - name: cuda
+           hostPath:
+             path: /usr/lib/powerpc64le-linux-gnu/
+         - name: cuda-lib
+           hostPath:
+             path: /usr/local/cuda-8.0/
+         - name: checkpoint
+           hostPath:
+             path: /root/runs/
+       containers:
+       - name: training-container
+         image: ppc64le/tf-train-flowers
+         imagePullPolicy: "IfNotPresent"
+         securityContext:
+           privileged: true
+         command:
+         - /bin/sh
+         - -c
+         args:
+         -  ./run-trainer.sh 10000 && rsync -ah flowers_train/ flowers-train/
+         volumeMounts:
+         - name: nvidia-driver
+           mountPath: /usr/lib/nvidia-375/
+         - name: cuda
+           mountPath: /usr/lib/powerpc64le-linux-gnu/
+         - name: cuda-lib
+           mountPath: /usr/local/cuda-8.0/
+         - name: checkpoint
+           mountPath: /flowers-train
