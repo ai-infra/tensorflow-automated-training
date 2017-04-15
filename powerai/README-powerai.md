@@ -6,15 +6,14 @@ for details on the example used here
 
 ## Build the docker image
 
-Clone this repo. Place the bazel and tensorflow binaries in this folder before starting the docker image build. 
-
-Refer to the following github project to build bazel and tensorflow for PowerPC LE 
-https://github.com/ai-infra/tensorflow-automated-build.git
+Clone this repo. 
 
 Run the following command to build the docker image
 ```bash
-docker build -t ppc64le/tf-train-flowers -f Dockerfile.ppc64le .
+docker build -t ppc64le/tf-train-flowers -f Dockerfile-powerai.ppc64le .
 ```
+
+Details on PowerAI distribution for deep learning is available from the following link: https://developer.ibm.com/linuxonpower/deep-learning-powerai/
 
 ## Run the docker image to start training
 
@@ -34,14 +33,9 @@ If the installation paths or nvidia driver versions are different then modify th
 ### Start training
 
 ```bash
-docker run -it --privileged -v /usr/local/cuda-8.0/:/usr/local/cuda-8.0/ -v /usr/lib/powerpc64le-linux-gnu/:/usr/lib/powerpc64le-linux-gnu/ -v /usr/lib/nvidia-375/:/usr/lib/nvidia-375/ -v /root/runs:/flowers-train ppc64le/tf-train-flowers /bin/bash -c "./run-trainer.sh 10000 && rsync -ah flowers_train/ flowers-train/"
+docker run -it --privileged -v /usr/local/cuda-8.0/:/usr/local/cuda-8.0/ -v /usr/lib/powerpc64le-linux-gnu/:/usr/lib/powerpc64le-linux-gnu/ -v /usr/lib/nvidia-375/:/usr/lib/nvidia-375/ -v /root/runs:/flowers-train ppc64le/tf-train-flowers /bin/bash -c "source /opt/DL/bazel/bin/bazel-activate && source /opt/DL/tensorflow/bin/tensorflow-activate && ./run-trainer.sh 10000 && rsync -ah flowers_train/ flowers-train/"
 ```
 
 ### Deploying in a Kubernetes based GPU cluster
 
-Look at the sample YAML file - tf-inception-trainer-flowers.yaml 
-
-
-### Using pre-built binaries from PowerAI offering
-
-Refer to the instructions in the following [guide](powerai/README-powerai.md)
+Look at the sample YAML file - tf-inception-trainer-flowers-powerai.yaml 

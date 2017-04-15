@@ -1,0 +1,30 @@
+FROM ppc64le/ubuntu:16.04
+
+MAINTAINER Pradipta Kr. Banerjee <pradipta.banerjee@gmail.com>
+
+RUN apt-get update -y && \
+      apt-get install -y \
+        wget \
+        curl \
+        openjdk-8-jdk \
+        git
+
+RUN wget https://public.dhe.ibm.com/software/server/POWER/Linux/mldl/ubuntu/mldl-repo-local_3.4.1_ppc64el.deb
+RUN wget https://developer.nvidia.com/compute/cuda/8.0/prod/local_installers/cuda-repo-ubuntu1604-8-0-local-ga2_8.0.54-1_ppc64el-deb
+RUN dpkg -i mldl-repo-local_3.4.1_ppc64el.deb && \
+    dpkg -i cuda-repo-ubuntu1604-8-0-local-ga2_8.0.54-1_ppc64el-deb && \
+    apt-get update -y
+RUN apt-get install -y tensorflow
+
+RUN git clone https://github.com/tensorflow/models.git && \
+  cd models && \
+  git checkout d50c51cfd1f6696de0c9f743ffb06e95471ff634 && \
+  git checkout -b ppc-model
+
+
+WORKDIR /
+
+COPY run-trainer.sh /
+
+
+CMD ["/bin/bash"]
